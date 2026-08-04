@@ -1,0 +1,19 @@
+services:
+  mongodb1:
+    image: mongo
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=pass123
+      
+  mongoexpress1:
+    image: mongo-express
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_BASICAUTH_USERNAME=sarvin
+      - ME_CONFIG_BASICAUTH_PASSWORD=sarvinpass
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=pass123
+      - ME_CONFIG_MONGODB_SERVER=mongodb1
