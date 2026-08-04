@@ -8,7 +8,7 @@ import api from "./services/api";
 function App() {
     const usersEndpoint = "/users";
 
-  const [users, setUsers] = useState([{name :'sarvin'}]);
+  const [users, setUsers] = useState([{name :'Ali'}]);
   const [error, setError] = useState();
 
 
