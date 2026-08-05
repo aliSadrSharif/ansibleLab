@@ -26,3 +26,7 @@ Thumbs.db
 
 # Ansible
 *.retry
+
+# md files
+assignment*.md
+roadmap*.md
