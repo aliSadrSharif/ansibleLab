@@ -10,7 +10,6 @@ COPY --chown=app:app package*.json ./
 
 # install deps
 RUN npm install
-RUN npm install -g --froce nodemon 
 
 # copy source
 COPY --chown=app:app . .
@@ -18,14 +17,11 @@ COPY --chown=app:app . .
 # permissions
 RUN chown -R app:app /app
 
-# env
-
-
-# non-root user 
+# non-root user
 USER app
 
 # port
 EXPOSE 3001
 
 # start app
-CMD ["nodemon", "index"]
+CMD ["node", "index.js"]
