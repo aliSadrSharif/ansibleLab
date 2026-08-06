@@ -1,0 +1,8 @@
+---
+app_domain: myapp.local
+ssl_dir: /etc/nginx/ssl
+ssl_cert_path: "{{ ssl_dir }}/{{ app_domain }}.crt"
+ssl_key_path: "{{ ssl_dir }}/{{ app_domain }}.key"
+web_upstream: "127.0.0.1:3000"
+api_upstream: "127.0.0.1:3001"
+mongo_express_upstream: "127.0.0.1:8081"
