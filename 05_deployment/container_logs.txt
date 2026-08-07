@@ -1,0 +1,50 @@
+mongo-express-1  | /docker-entrypoint.sh: line 15: mongo: Try again
+mongo-express-1  | /docker-entrypoint.sh: line 15: /dev/tcp/mongo/27017: Invalid argument
+mongo-express-1  | Thu Aug  6 15:41:20 UTC 2026 retrying to connect to mongo:27017 (9/10)
+mongo-express-1  | /docker-entrypoint.sh: line 15: mongo: Try again
+mongo-express-1  | /docker-entrypoint.sh: line 15: /dev/tcp/mongo/27017: Invalid argument
+mongo-express-1  | Thu Aug  6 15:41:26 UTC 2026 retrying to connect to mongo:27017 (10/10)
+mongo-express-1  | /docker-entrypoint.sh: line 15: mongo: Try again
+api-1            | ◇ injected env (0) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+api-1            | ✅ Connected to MongoDB
+api-1            | 🚀 Server running on http://localhost:3001
+api-1            | kiarash-test
+api-1            | kiarash-test
+mongo-express-1  | /docker-entrypoint.sh: line 15: /dev/tcp/mongo/27017: Invalid argument
+mongo-express-1  | No custom config.js found, loading config.default.js
+mongo-express-1  | Welcome to mongo-express 1.0.2
+mongo-express-1  | ------------------------
+mongo-express-1  | 
+mongo-express-1  | 
+mongo-express-1  | Mongo Express server listening at http://0.0.0.0:8081
+mongo-express-1  | [31mServer is open to allow connections from anyone (0.0.0.0)[39m
+web-1            |  HTTP  8/6/2026 3:46:32 PM 127.0.0.1 Returned 200 in 1 ms
+web-1            |  HTTP  8/6/2026 3:47:02 PM 127.0.0.1 GET /
+web-1            |  HTTP  8/6/2026 3:47:02 PM 127.0.0.1 Returned 200 in 1 ms
+web-1            |  HTTP  8/6/2026 3:47:18 PM 172.19.0.1 GET /
+web-1            |  HTTP  8/6/2026 3:47:18 PM 172.19.0.1 Returned 200 in 1 ms
+web-1            |  HTTP  8/6/2026 3:47:32 PM 127.0.0.1 GET /
+web-1            |  HTTP  8/6/2026 3:47:32 PM 127.0.0.1 Returned 200 in 1 ms
+web-1            |  HTTP  8/6/2026 3:48:02 PM 127.0.0.1 GET /
+web-1            |  HTTP  8/6/2026 3:48:02 PM 127.0.0.1 Returned 200 in 1 ms
+web-1            |  HTTP  8/6/2026 3:48:33 PM 127.0.0.1 GET /
+web-1            |  HTTP  8/6/2026 3:48:33 PM 127.0.0.1 Returned 200 in 1 ms
+web-1            |  HTTP  8/6/2026 3:49:03 PM 127.0.0.1 GET /
+web-1            |  HTTP  8/6/2026 3:49:03 PM 127.0.0.1 Returned 200 in 1 ms
+web-1            |  HTTP  8/6/2026 3:49:33 PM 127.0.0.1 GET /
+web-1            |  HTTP  8/6/2026 3:49:33 PM 127.0.0.1 Returned 200 in 1 ms
+db-1             | {"t":{"$date":"2026-08-06T15:47:32.789+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn21","msg":"Connection ended","attr":{"remote":"127.0.0.1:59660","connectionId":21,"connectionCount":6}}
+db-1             | {"t":{"$date":"2026-08-06T15:48:02.932+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"127.0.0.1:57814","connectionId":22,"connectionCount":7}}
+db-1             | {"t":{"$date":"2026-08-06T15:48:02.933+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn22","msg":"client metadata","attr":{"remote":"127.0.0.1:57814","client":"conn22","doc":{"application":{"name":"MongoDB Shell"},"driver":{"name":"MongoDB Internal Client","version":"4.4.30"},"os":{"type":"Linux","name":"Ubuntu","architecture":"x86_64","version":"20.04"}}}}
+db-1             | {"t":{"$date":"2026-08-06T15:48:02.941+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn22","msg":"Connection ended","attr":{"remote":"127.0.0.1:57814","connectionId":22,"connectionCount":6}}
+db-1             | {"t":{"$date":"2026-08-06T15:48:28.439+00:00"},"s":"I",  "c":"STORAGE",  "id":22430,   "ctx":"WTCheckpointThread","msg":"WiredTiger message","attr":{"message":"[1786031308:439762][1:0x780675f13700], WT_SESSION.checkpoint: [WT_VERB_CHECKPOINT_PROGRESS] saving checkpoint snapshot min: 34, snapshot max: 34 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 7"}}
+db-1             | {"t":{"$date":"2026-08-06T15:48:33.040+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"127.0.0.1:51410","connectionId":23,"connectionCount":7}}
+db-1             | {"t":{"$date":"2026-08-06T15:48:33.040+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn23","msg":"client metadata","attr":{"remote":"127.0.0.1:51410","client":"conn23","doc":{"application":{"name":"MongoDB Shell"},"driver":{"name":"MongoDB Internal Client","version":"4.4.30"},"os":{"type":"Linux","name":"Ubuntu","architecture":"x86_64","version":"20.04"}}}}
+db-1             | {"t":{"$date":"2026-08-06T15:48:33.045+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn23","msg":"Connection ended","attr":{"remote":"127.0.0.1:51410","connectionId":23,"connectionCount":6}}
+db-1             | {"t":{"$date":"2026-08-06T15:49:03.147+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"127.0.0.1:56628","connectionId":24,"connectionCount":7}}
+db-1             | {"t":{"$date":"2026-08-06T15:49:03.147+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn24","msg":"client metadata","attr":{"remote":"127.0.0.1:56628","client":"conn24","doc":{"application":{"name":"MongoDB Shell"},"driver":{"name":"MongoDB Internal Client","version":"4.4.30"},"os":{"type":"Linux","name":"Ubuntu","architecture":"x86_64","version":"20.04"}}}}
+db-1             | {"t":{"$date":"2026-08-06T15:49:03.152+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn24","msg":"Connection ended","attr":{"remote":"127.0.0.1:56628","connectionId":24,"connectionCount":6}}
+db-1             | {"t":{"$date":"2026-08-06T15:49:28.458+00:00"},"s":"I",  "c":"STORAGE",  "id":22430,   "ctx":"WTCheckpointThread","msg":"WiredTiger message","attr":{"message":"[1786031368:458388][1:0x780675f13700], WT_SESSION.checkpoint: [WT_VERB_CHECKPOINT_PROGRESS] saving checkpoint snapshot min: 36, snapshot max: 36 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 7"}}
+db-1             | {"t":{"$date":"2026-08-06T15:49:33.250+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"127.0.0.1:46296","connectionId":25,"connectionCount":7}}
+db-1             | {"t":{"$date":"2026-08-06T15:49:33.250+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn25","msg":"client metadata","attr":{"remote":"127.0.0.1:46296","client":"conn25","doc":{"application":{"name":"MongoDB Shell"},"driver":{"name":"MongoDB Internal Client","version":"4.4.30"},"os":{"type":"Linux","name":"Ubuntu","architecture":"x86_64","version":"20.04"}}}}
+db-1             | {"t":{"$date":"2026-08-06T15:49:33.255+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn25","msg":"Connection ended","attr":{"remote":"127.0.0.1:46296","connectionId":25,"connectionCount":6}}

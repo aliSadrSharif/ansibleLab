@@ -1,0 +1,13 @@
+* 69b6a1d Add project README, architecture, deployment guide and troubleshooting docs (stage 9)
+* cfafc3a Automate full deployment with Ansible: app + Nginx + SSL (stage 8)
+* 4fc3f52 Add self-signed TLS certificate and HTTPS redirect (stage 7)
+* bdb247a Configure system Nginx as reverse proxy for myapp.local (stage 6)
+* e2a828b Deploy stack to the target server and verify access (stage 5)
+* 69bfa64 Harden Dockerfiles, rework compose stack, and record build/test evidence (stage 4)
+* 1d4c42a Document chosen project structure and tech stack (stage 3)
+* 84a5a8a Add environment docs and Ansible server provisioning (stages 1-2)
+* 5e4f084 Update user state in App.js, clean up index.js by removing performance measurement comments, and change nginx configuration to use new domain name and SSL certificates.
+* 6fd8126 Refactor docker-compose.yaml: Update API URL for production, switch to expose for ports, and add nginx service for better deployment management.
+* bfdc7bd Remove HW_L5_03_Team Project.pdf from the repository
+* 887c8c9 Update REACT_APP_API_URL in docker-compose.yaml to use localhost for local development
+* af57734 intiat

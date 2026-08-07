@@ -1,31 +1,24 @@
-FROM node:24-alpine3.22 
+# syntax=docker/dockerfile:1
+FROM node:24-alpine3.22
 
-# create user
+# Non-root user for the runtime process
 RUN addgroup -S app && adduser -S app -G app
 
 WORKDIR /app
 
-# copy package files
-COPY --chown=app:app package*.json ./
+# Install dependencies first so this layer is cache-hit on source-only changes
+COPY package*.json ./
+RUN npm install --omit=dev && npm cache clean --force
 
-# install deps
-RUN npm install
-RUN npm install -g --froce nodemon 
+# Copy application source
+COPY . .
 
-# copy source
-COPY --chown=app:app . .
-
-# permissions
 RUN chown -R app:app /app
-
-# env
-
-
-# non-root user 
 USER app
 
-# port
 EXPOSE 3001
 
-# start app
-CMD ["nodemon", "index"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD node -e "require('http').get('http://127.0.0.1:3001/users', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"
+
+CMD ["node", "index.js"]

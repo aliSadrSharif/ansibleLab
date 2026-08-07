@@ -1,0 +1,174 @@
+[WARNING]: Deprecation warnings can be disabled by setting `deprecation_warnings=False` in ansible.cfg.
+[DEPRECATION WARNING]: apt_key has been deprecated. Use deb822_repository instead. This feature will be removed from ansible-core version 2.25.
+Origin: /home/kiarash/ansibleLab/02_ansible_setup/server_setup.yml:76:7
+
+74
+75     - name: Add Docker's official GPG key
+76       apt_key:
+         ^ column 7
+
+[DEPRECATION WARNING]: apt_repository has been deprecated. Use deb822_repository instead. This feature will be removed from ansible-core version 2.25.
+Origin: /home/kiarash/ansibleLab/02_ansible_setup/server_setup.yml:82:7
+
+80
+81     - name: Add Docker apt repository
+82       apt_repository:
+         ^ column 7
+
+
+PLAY [Prepare server for Docker + Nginx deployment] ****************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [target]
+
+TASK [Update apt package index] ************************************************
+ok: [target]
+
+TASK [Install base packages] ***************************************************
+ok: [target]
+
+TASK [Install UFW] *************************************************************
+ok: [target]
+
+TASK [Allow SSH (22/tcp) through UFW] ******************************************
+ok: [target]
+
+TASK [Allow HTTP (80/tcp) through UFW] *****************************************
+ok: [target]
+
+TASK [Allow HTTPS (443/tcp) through UFW] ***************************************
+ok: [target]
+
+TASK [Enable UFW with default deny-incoming / allow-outgoing] ******************
+ok: [target]
+
+TASK [Set default incoming policy to deny] *************************************
+ok: [target]
+
+TASK [Check whether the Docker apt repository is already configured] ***********
+ok: [target]
+
+TASK [Add Docker's official GPG key] *******************************************
+skipping: [target]
+
+TASK [Add Docker apt repository] ***********************************************
+skipping: [target]
+
+TASK [Install Docker Engine and Compose plugin] ********************************
+ok: [target]
+
+TASK [Start and enable Docker service] *****************************************
+ok: [target]
+
+TASK [Add invoking user to the docker group] ***********************************
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /home/kiarash/ansibleLab/02_ansible_setup/server_setup.yml:105:15
+
+103     - name: Add invoking user to the docker group
+104       user:
+105         name: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+                  ^ column 15
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+ok: [target]
+
+TASK [Install Nginx] ***********************************************************
+ok: [target]
+
+TASK [Start and enable Nginx service] ******************************************
+ok: [target]
+
+PLAY [Deploy application with Docker Compose] **********************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [target]
+
+TASK [Ensure application directory exists] *************************************
+ok: [target]
+
+TASK [Verify a local .env file exists (required — holds DB credentials)] *******
+ok: [target -> localhost]
+
+TASK [Fail early with a clear message if .env is missing] **********************
+ok: [target] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+
+TASK [Copy frontend source] ****************************************************
+ok: [target]
+
+TASK [Copy backend source] *****************************************************
+ok: [target]
+
+TASK [Copy docker-compose.yaml] ************************************************
+ok: [target]
+
+TASK [Copy .env (credentials)] *************************************************
+ok: [target]
+
+TASK [Build Docker images] *****************************************************
+changed: [target]
+
+TASK [Bring the stack up] ******************************************************
+ok: [target]
+
+TASK [Wait for the frontend to accept connections] *****************************
+ok: [target]
+
+TASK [Wait for the API to accept connections] **********************************
+ok: [target]
+
+TASK [Show container status] ***************************************************
+ok: [target]
+
+TASK [Print container status] **************************************************
+ok: [target] => {
+    "compose_status.stdout_lines": [
+        "NAME                    IMAGE           COMMAND                  SERVICE         CREATED          STATUS                            PORTS",
+        "myapp-api-1             myapp-api       \"docker-entrypoint.s…\"   api             15 seconds ago   Up 3 seconds (health: starting)   127.0.0.1:3001->3001/tcp",
+        "myapp-db-1              mongo:4.4       \"docker-entrypoint.s…\"   db              5 minutes ago    Up 5 minutes (healthy)            27017/tcp",
+        "myapp-mongo-express-1   mongo-express   \"/sbin/tini -- /dock…\"   mongo-express   2 minutes ago    Up 2 minutes                      127.0.0.1:8081->8081/tcp",
+        "myapp-web-1             myapp-web       \"docker-entrypoint.s…\"   web             15 seconds ago   Up 4 seconds (health: starting)   127.0.0.1:3000->3000/tcp"
+    ]
+}
+
+PLAY [Configure Nginx reverse proxy with SSL] **********************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [target]
+
+TASK [Create SSL directory] ****************************************************
+ok: [target]
+
+TASK [Generate private key] ****************************************************
+ok: [target]
+
+TASK [Generate self-signed certificate request] ********************************
+ok: [target]
+
+TASK [Generate self-signed certificate] ****************************************
+ok: [target]
+
+TASK [Deploy Nginx site configuration from template] ***************************
+changed: [target]
+
+TASK [Enable the site (symlink into sites-enabled)] ****************************
+ok: [target]
+
+TASK [Disable the default site] ************************************************
+ok: [target]
+
+TASK [Test full Nginx configuration] *******************************************
+ok: [target]
+
+TASK [Add domain to /etc/hosts for local resolution] ***************************
+ok: [target]
+
+RUNNING HANDLER [Reload nginx] *************************************************
+changed: [target]
+
+PLAY RECAP *********************************************************************
+target                     : ok=40   changed=3    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0   
+

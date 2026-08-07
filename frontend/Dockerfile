@@ -1,33 +1,31 @@
-# Use official Node.js runtime (Alpine version for smaller image size)
-FROM node:24-alpine3.22
+# syntax=docker/dockerfile:1
 
-# Create a non-root group and user for security
-RUN addgroup -S app && adduser -S app -G app
-
-# Set working directory inside container
+# ---- Build stage ---------------------------------------------------------
+FROM node:24-alpine3.22 AS build
 WORKDIR /app
 
-# Change ownership of app directory to the non-root user
-RUN chown -R app:app /app
-
-# Switch to non-root user (security best practice)
-USER app
-
-# Copy package files first (for better Docker cache usage)
-COPY --chown=app:app package*.json .
-
-# Install dependencies
+# Install dependencies first so this layer is cache-hit on source-only changes
+COPY package*.json ./
 RUN npm install
 
-# Copy all project files into container
-COPY --chown=app:app . .
+# Copy source and produce the optimized production build
+COPY . .
+ARG REACT_APP_API_URL=/api
+ENV REACT_APP_API_URL=${REACT_APP_API_URL}
+RUN npm run build
 
-# Environment variable for backend API URL
-# NOTE: In Docker Compose, this should usually be overridden there
-ENV REACT_APP_API_URL=http://localhost:3001 
+# ---- Runtime stage ---------------------------------------------------------
+FROM node:24-alpine3.22 AS runtime
+RUN addgroup -S app && adduser -S app -G app \
+    && npm install -g serve
 
-# Expose React development server port
+WORKDIR /app
+COPY --from=build --chown=app:app /app/build ./build
+
+USER app
 EXPOSE 3000
 
-# Start the React application
-CMD ["npm", "start"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD node -e "require('http').get('http://127.0.0.1:3000', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"
+
+CMD ["serve", "-s", "build", "-l", "3000"]
