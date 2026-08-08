@@ -1,0 +1,65 @@
+# Override for nginx/loadbalancer.conf — runs three API replicas on distinct host ports.
+#
+# Usage:
+#   docker compose -f docker-compose.yaml -f docker-compose.loadbalancer.yaml up -d --build
+#
+# Then deploy nginx/loadbalancer.conf (or loadbalancer-ssl.conf) on the host.
+
+services:
+  api:
+    profiles: ["single"]
+    ports: []
+
+  api-1:
+    build:
+      context: backend
+    ports:
+      - "127.0.0.1:3001:3001"
+    environment:
+      - DB_URL=mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@db:27017/?authSource=admin
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/users', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  api-2:
+    build:
+      context: backend
+    ports:
+      - "127.0.0.1:3002:3001"
+    environment:
+      - DB_URL=mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@db:27017/?authSource=admin
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/users', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  api-3:
+    build:
+      context: backend
+    ports:
+      - "127.0.0.1:3003:3001"
+    environment:
+      - DB_URL=mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@db:27017/?authSource=admin
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/users', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
