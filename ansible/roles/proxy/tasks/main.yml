@@ -1,0 +1,31 @@
+---
+- name: Deploy Nginx site configuration
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: "/etc/nginx/sites-available/{{ domain_name }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload Nginx
+
+- name: Enable site via symlink
+  ansible.builtin.file:
+    src: "/etc/nginx/sites-available/{{ domain_name }}"
+    dest: "/etc/nginx/sites-enabled/{{ domain_name }}"
+    state: link
+  notify: Reload Nginx
+
+- name: Disable default Nginx site
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: Reload Nginx
+
+- name: Test Nginx configuration
+  ansible.builtin.command: nginx -t
+  register: nginx_test
+  changed_when: false
+
+- name: Show Nginx test result
+  ansible.builtin.debug:
+    var: nginx_test.stderr

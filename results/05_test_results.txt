@@ -1,0 +1,40 @@
+=== curl -I http://127.0.0.1/ (Host: myapp.local) ===
+HTTP/1.1 301 Moved Permanently
+Server: nginx/1.18.0 (Ubuntu)
+Date: Mon, 10 Aug 2026 13:58:17 GMT
+Content-Type: text/html
+Content-Length: 178
+Connection: keep-alive
+Location: https://myapp.local/
+
+
+=== curl -kI https://127.0.0.1/ (Host: myapp.local) ===
+HTTP/1.1 200 OK
+Server: nginx/1.18.0 (Ubuntu)
+Date: Mon, 10 Aug 2026 13:58:17 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 644
+Connection: keep-alive
+Content-Disposition: inline; filename="index.html"
+Accept-Ranges: bytes
+ETag: "348e0792b2f86356ea2cfe98210733220138f5d3"
+Vary: Accept-Encoding
+
+
+=== curl -k https://127.0.0.1/api/users (Host: myapp.local) ===
+[]
+=== direct loopback web ===
+HTTP/1.1 200 OK
+Content-Length: 644
+Content-Disposition: inline; filename="index.html"
+Accept-Ranges: bytes
+ETag: "348e0792b2f86356ea2cfe98210733220138f5d3"
+Content-Type: text/html; charset=utf-8
+Vary: Accept-Encoding
+Date: Mon, 10 Aug 2026 13:58:17 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+=== direct loopback api ===
+[]

@@ -11,7 +11,9 @@ RUN npm install
 # Copy source and produce the optimized production build
 COPY . .
 ARG REACT_APP_API_URL=/api
+ARG NODE_OPTIONS=--max-old-space-size=1536
 ENV REACT_APP_API_URL=${REACT_APP_API_URL}
+ENV NODE_OPTIONS=${NODE_OPTIONS}
 RUN npm run build
 
 # ---- Runtime stage ---------------------------------------------------------

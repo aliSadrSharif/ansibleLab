@@ -13,7 +13,10 @@ backend/dist/
 !.env.example
 *.pem
 *.key
+*.crt
+nginx/ssl/
 07_ssl/certs/
+ansible/group_vars/all/secrets.yml
 
 # Logs
 npm-debug.log*

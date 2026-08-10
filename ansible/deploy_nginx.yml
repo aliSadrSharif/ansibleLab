@@ -1,0 +1,8 @@
+---
+# Stage 6/7/8: generate SSL certs and configure host Nginx reverse proxy.
+- name: Deploy Nginx and SSL
+  hosts: webservers
+  become: true
+  roles:
+    - ssl
+    - proxy

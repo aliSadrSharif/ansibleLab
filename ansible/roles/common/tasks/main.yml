@@ -1,0 +1,81 @@
+---
+- name: Disable apt CDROM / file:/cdrom sources that break update_cache
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list
+    regexp: '^(\s*deb\b.*(?:cdrom:|file:/+cdrom).*)$'
+    replace: '# \1'
+
+- name: Find apt list fragments
+  ansible.builtin.find:
+    paths:
+      - /etc/apt/sources.list.d
+    patterns: "*.list"
+  register: apt_lists
+
+- name: Comment CDROM entries in list fragments
+  ansible.builtin.replace:
+    path: "{{ item.path }}"
+    regexp: '^(\s*deb\b.*(?:cdrom:|file:/+cdrom).*)$'
+    replace: '# \1'
+  loop: "{{ apt_lists.files }}"
+  when: apt_lists.files | length > 0
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 0
+
+- name: Upgrade all packages
+  ansible.builtin.apt:
+    upgrade: dist
+    autoremove: true
+    autoclean: true
+
+- name: Install essential packages
+  ansible.builtin.apt:
+    name:
+      - curl
+      - wget
+      - git
+      - vim
+      - htop
+      - ufw
+      - rsync
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - apt-transport-https
+      - python3-pip
+    state: present
+
+- name: Allow SSH through UFW
+  community.general.ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+
+- name: Allow HTTP through UFW
+  community.general.ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+
+- name: Allow HTTPS through UFW
+  community.general.ufw:
+    rule: allow
+    port: "443"
+    proto: tcp
+
+- name: Set UFW default incoming policy to deny
+  community.general.ufw:
+    direction: incoming
+    policy: deny
+
+- name: Set UFW default outgoing policy to allow
+  community.general.ufw:
+    direction: outgoing
+    policy: allow
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled

@@ -1,0 +1,7 @@
+---
+# Stage 5/8: deploy the application stack with Docker Compose.
+- name: Deploy application
+  hosts: webservers
+  become: true
+  roles:
+    - app

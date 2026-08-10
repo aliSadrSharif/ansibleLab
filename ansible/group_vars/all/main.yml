@@ -1,0 +1,24 @@
+---
+# Non-secret configuration shared by all hosts.
+domain_name: myapp.local
+app_dir: /opt/myapp
+app_owner: tantan
+app_group: tantan
+
+tls_enabled: true
+ssl_dir: /etc/nginx/ssl
+ssl_cert_days: 365
+
+web_port: 3000
+api_ports:
+  - 3001
+  - 3002
+  - 3003
+mongo_express_port: 8081
+
+# Project source on the Ansible controller (repo root).
+project_src: "{{ playbook_dir }}/.."
+
+# Local evidence output directories on the controller.
+results_dir: "{{ playbook_dir }}/../results"
+md_dir: "{{ playbook_dir }}/../md"

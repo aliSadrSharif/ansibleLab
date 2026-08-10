@@ -1,0 +1,101 @@
+---
+- name: Create application directory
+  ansible.builtin.file:
+    path: "{{ app_dir }}"
+    state: directory
+    owner: "{{ app_owner }}"
+    group: "{{ app_group }}"
+    mode: "0755"
+
+- name: Sync project files to server
+  ansible.posix.synchronize:
+    src: "{{ project_src }}/"
+    dest: "{{ app_dir }}/"
+    delete: true
+    recursive: true
+    rsync_opts:
+      - "--exclude=.git"
+      - "--exclude=node_modules"
+      - "--exclude=frontend/node_modules"
+      - "--exclude=backend/node_modules"
+      - "--exclude=frontend/build"
+      - "--exclude=results"
+      - "--exclude=md"
+      - "--exclude=ansible"
+      - "--exclude=old"
+      - "--exclude=.env"
+      - "--exclude=nginx/ssl"
+  become: false
+
+- name: Ensure app directory ownership
+  ansible.builtin.file:
+    path: "{{ app_dir }}"
+    state: directory
+    owner: "{{ app_owner }}"
+    group: "{{ app_group }}"
+    recurse: true
+
+- name: Deploy application .env from secrets
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ app_dir }}/.env"
+    owner: "{{ app_owner }}"
+    group: "{{ app_group }}"
+    mode: "0600"
+
+- name: Build and start Docker Compose stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_dir }}"
+    files:
+      - docker-compose.yml
+    build: always
+    state: present
+    pull: missing
+  register: compose_up
+
+- name: Wait for web frontend on loopback
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: "{{ web_port }}"
+    timeout: 180
+    delay: 5
+
+- name: Wait for API replicas on loopback
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: "{{ item }}"
+    timeout: 180
+  loop: "{{ api_ports }}"
+
+- name: Wait for mongo-express on loopback
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: "{{ mongo_express_port }}"
+    timeout: 180
+
+- name: Verify web responds
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ web_port }}/"
+    status_code: 200
+    return_content: false
+  register: web_check
+  retries: 10
+  delay: 3
+  until: web_check is succeeded
+
+- name: Verify API responds
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ api_ports[0] }}/users"
+    status_code: 200
+    return_content: true
+  register: api_check
+  retries: 10
+  delay: 3
+  until: api_check is succeeded
+
+- name: Show compose and health summary
+  ansible.builtin.debug:
+    msg:
+      - "Compose changed: {{ compose_up.changed | default(false) }}"
+      - "Web status: {{ web_check.status }}"
+      - "API status: {{ api_check.status }}"

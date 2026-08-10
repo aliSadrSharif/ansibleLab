@@ -1,0 +1,215 @@
+
+PLAY [Prepare server for deployment] *******************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [vm1]
+
+TASK [common : Disable apt CDROM / file:/cdrom sources that break update_cache] ***
+changed: [vm1]
+
+TASK [common : Find apt list fragments] ****************************************
+ok: [vm1]
+
+TASK [common : Comment CDROM entries in list fragments] ************************
+ok: [vm1] => (item={'path': '/etc/apt/sources.list.d/original.list', 'mode': '0644', 'isdir': False, 'ischr': False, 'isblk': False, 'isreg': True, 'isfifo': False, 'islnk': False, 'issock': False, 'uid': 0, 'gid': 0, 'size': 2467, 'inode': 1442821, 'dev': 2050, 'nlink': 1, 'atime': 1786369884.7560174, 'mtime': 1786369865.9541113, 'ctime': 1786369865.9541113, 'gr_name': 'root', 'pw_name': 'root', 'wusr': True, 'rusr': True, 'xusr': False, 'wgrp': False, 'rgrp': True, 'xgrp': False, 'woth': False, 'roth': True, 'xoth': False, 'isuid': False, 'isgid': False})
+
+TASK [common : Update apt cache] ***********************************************
+changed: [vm1]
+
+TASK [common : Upgrade all packages] *******************************************
+ok: [vm1]
+
+TASK [common : Install essential packages] *************************************
+ok: [vm1]
+
+TASK [common : Allow SSH through UFW] ******************************************
+ok: [vm1]
+
+TASK [common : Allow HTTP through UFW] *****************************************
+ok: [vm1]
+
+TASK [common : Allow HTTPS through UFW] ****************************************
+ok: [vm1]
+
+TASK [common : Set UFW default incoming policy to deny] ************************
+ok: [vm1]
+
+TASK [common : Set UFW default outgoing policy to allow] ***********************
+ok: [vm1]
+
+TASK [common : Enable UFW] *****************************************************
+ok: [vm1]
+
+TASK [docker : Create keyrings directory] **************************************
+ok: [vm1]
+
+TASK [docker : Download Docker GPG key] ****************************************
+ok: [vm1]
+
+TASK [docker : Add Docker apt repository] **************************************
+changed: [vm1]
+
+TASK [docker : Install Docker CE and Compose plugin] ***************************
+changed: [vm1]
+
+TASK [docker : Ensure Docker service is started and enabled] *******************
+changed: [vm1]
+
+TASK [docker : Add deploy user to docker group] ********************************
+changed: [vm1]
+
+TASK [docker : Install Docker Python SDK for Ansible modules] ******************
+ok: [vm1]
+
+TASK [nginx : Install Nginx] ***************************************************
+changed: [vm1]
+
+TASK [nginx : Ensure Nginx is started and enabled] *****************************
+changed: [vm1]
+
+PLAY [Deploy application] ******************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [vm1]
+
+TASK [app : Create application directory] **************************************
+changed: [vm1]
+
+TASK [app : Sync project files to server] **************************************
+changed: [vm1]
+
+TASK [app : Ensure app directory ownership] ************************************
+ok: [vm1]
+
+TASK [app : Deploy application .env from secrets] ******************************
+changed: [vm1]
+
+TASK [app : Build and start Docker Compose stack] ******************************
+[WARNING]: Docker compose: image myapp-api-3: Built
+[WARNING]: Docker compose: image myapp-web: Built
+[WARNING]: Docker compose: image myapp-api-1: Built
+[WARNING]: Docker compose: image myapp-api-2: Built
+changed: [vm1]
+
+TASK [app : Wait for web frontend on loopback] *********************************
+ok: [vm1]
+
+TASK [app : Wait for API replicas on loopback] *********************************
+ok: [vm1] => (item=3001)
+ok: [vm1] => (item=3002)
+ok: [vm1] => (item=3003)
+
+TASK [app : Wait for mongo-express on loopback] ********************************
+ok: [vm1]
+
+TASK [app : Verify web responds] ***********************************************
+ok: [vm1]
+
+TASK [app : Verify API responds] ***********************************************
+ok: [vm1]
+
+TASK [app : Show compose and health summary] ***********************************
+ok: [vm1] => 
+  msg:
+  - 'Compose changed: True'
+  - 'Web status: 200'
+  - 'API status: 200'
+
+PLAY [Deploy Nginx and SSL] ****************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [vm1]
+
+TASK [ssl : Create SSL directory] **********************************************
+changed: [vm1]
+
+TASK [ssl : Generate private key] **********************************************
+changed: [vm1]
+
+TASK [ssl : Generate certificate signing request with SAN] *********************
+changed: [vm1]
+
+TASK [ssl : Generate self-signed certificate from CSR] *************************
+changed: [vm1]
+
+TASK [proxy : Deploy Nginx site configuration] *********************************
+changed: [vm1]
+
+TASK [proxy : Enable site via symlink] *****************************************
+changed: [vm1]
+
+TASK [proxy : Disable default Nginx site] **************************************
+changed: [vm1]
+
+TASK [proxy : Test Nginx configuration] ****************************************
+ok: [vm1]
+
+TASK [proxy : Show Nginx test result] ******************************************
+ok: [vm1] => 
+  nginx_test.stderr: |-
+    nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+    nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+RUNNING HANDLER [proxy : Reload Nginx] *****************************************
+changed: [vm1]
+
+PLAY [Collect deployment evidence] *********************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [vm1]
+
+TASK [evidence : Ensure results directory exists on controller] ****************
+changed: [vm1 -> localhost]
+
+TASK [evidence : Collect system info for server_connection.txt] ****************
+ok: [vm1]
+
+TASK [evidence : Write server_connection.txt] **********************************
+changed: [vm1 -> localhost]
+
+TASK [evidence : Collect Docker / Nginx / firewall verification] ***************
+ok: [vm1]
+
+TASK [evidence : Write 02_verification.txt] ************************************
+changed: [vm1 -> localhost]
+
+TASK [evidence : Collect container status after deploy] ************************
+ok: [vm1]
+
+TASK [evidence : Write 05_container_status.txt] ********************************
+changed: [vm1 -> localhost]
+
+TASK [evidence : Also write 04_container_status.txt (local build evidence mirror)] ***
+changed: [vm1 -> localhost]
+
+TASK [evidence : Collect important container logs] *****************************
+ok: [vm1]
+
+TASK [evidence : Write container_logs.txt] *************************************
+changed: [vm1 -> localhost]
+
+TASK [evidence : Collect Nginx configuration] **********************************
+ok: [vm1]
+
+TASK [evidence : Write nginx_config.txt and nginx_ssl_config.txt] **************
+changed: [vm1 -> localhost] => (item=nginx_config.txt)
+changed: [vm1 -> localhost] => (item=nginx_ssl_config.txt)
+
+TASK [evidence : Collect certificate information] ******************************
+ok: [vm1]
+
+TASK [evidence : Write certificate_info.txt] ***********************************
+changed: [vm1 -> localhost]
+
+TASK [evidence : Test from server (localhost via Nginx)] ***********************
+ok: [vm1]
+
+TASK [evidence : Write 05_test_results.txt (server-side)] **********************
+changed: [vm1 -> localhost]
+
+TASK [evidence : Write 08_verification.txt] ************************************
+changed: [vm1 -> localhost]
+
+PLAY RECAP *********************************************************************
+vm1                        : ok=63   changed=30   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
