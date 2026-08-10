@@ -1,0 +1,52 @@
+---
+- name: Create SSL directory
+  ansible.builtin.file:
+    path: "{{ ssl_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: Generate private key
+  community.crypto.openssl_privatekey:
+    path: "{{ ssl_dir }}/{{ domain_name }}.key"
+    size: 2048
+    type: RSA
+    mode: "0600"
+    owner: root
+    group: root
+
+- name: Generate certificate signing request with SAN
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ ssl_dir }}/{{ domain_name }}.key"
+    common_name: "{{ domain_name }}"
+    organization_name: DaneshkarTeamProject
+    organizational_unit_name: DevOps
+    country_name: DE
+    state_or_province_name: Saxony
+    locality_name: Dresden
+    subject_alt_name:
+      - "DNS:{{ domain_name }}"
+      - "DNS:localhost"
+      - "IP:127.0.0.1"
+    basic_constraints:
+      - "CA:FALSE"
+    basic_constraints_critical: true
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_critical: true
+    extended_key_usage:
+      - serverAuth
+  register: csr
+
+- name: Generate self-signed certificate from CSR
+  community.crypto.x509_certificate:
+    path: "{{ ssl_dir }}/{{ domain_name }}.crt"
+    csr_content: "{{ csr.csr }}"
+    privatekey_path: "{{ ssl_dir }}/{{ domain_name }}.key"
+    provider: selfsigned
+    selfsigned_not_after: "+{{ ssl_cert_days }}d"
+    mode: "0644"
+    owner: root
+    group: root

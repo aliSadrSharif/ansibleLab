@@ -1,4 +1,0 @@
-=== Deploy log: docker compose build && docker compose up -d (on target server = localhost) ===
-See 04_docker/build_log.txt for the full build output (identical build, same host).
-
-$ docker compose up -d

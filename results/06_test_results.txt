@@ -1,0 +1,49 @@
+=== curl -I http://myapp.local/ ===
+HTTP/1.1 301 Moved Permanently
+Server: nginx/1.18.0 (Ubuntu)
+Date: Mon, 10 Aug 2026 13:59:28 GMT
+Content-Type: text/html
+Content-Length: 178
+Connection: keep-alive
+Location: https://myapp.local/
+
+
+=== curl -kI https://myapp.local/ ===
+HTTP/1.1 200 OK
+Server: nginx/1.18.0 (Ubuntu)
+Date: Mon, 10 Aug 2026 13:59:28 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 644
+Connection: keep-alive
+Content-Disposition: inline; filename="index.html"
+Accept-Ranges: bytes
+ETag: "348e0792b2f86356ea2cfe98210733220138f5d3"
+Vary: Accept-Encoding
+
+
+=== curl -kL https://myapp.local/ (body head) ===
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Web site created using create-react-app"/><link rel="apple-touch-icon" href="/logo192.png"/><link rel="manifest" href="/manifest.json"/><title>React App</title><script defer="defer" src="/static/js/main.9a31383d.js"></script><link href="/static/css/main.86
+
+=== curl -k https://myapp.local/api/users ===
+[{"_id":"6a79d931d4ea2baa9e99a7d4","name":"ansible-test"}]
+
+=== curl -kI https://myapp.local/mongo/ (expect 401) ===
+HTTP/1.1 401 Unauthorized
+Server: nginx/1.18.0 (Ubuntu)
+Date: Mon, 10 Aug 2026 13:59:28 GMT
+Connection: keep-alive
+X-Powered-By: Express
+WWW-Authenticate: Basic realm="Authorization Required"
+
+
+=== API replica direct checks (via SSH on vm1) ===
+port 3001: [{"_id":"6a79d931d4ea2baa9e99a7d4","name":"ansible-test"}]
+port 3002: [{"_id":"6a79d931d4ea2baa9e99a7d4","name":"ansible-test"}]
+port 3003: [{"_id":"6a79d931d4ea2baa9e99a7d4","name":"ansible-test"}]
+
+=== Nginx /api/ through HTTPS (multiple requests) ===
+req 1: [{"_id":"6a79d931d4ea2baa9e99a7d4","name":"ansible-test"}]
+req 2: [{"_id":"6a79d931d4ea2baa9e99a7d4","name":"ansible-test"}]
+req 3: [{"_id":"6a79d931d4ea2baa9e99a7d4","name":"ansible-test"}]
+req 4: [{"_id":"6a79d931d4ea2baa9e99a7d4","name":"ansible-test"}]
+req 5: [{"_id":"6a79d931d4ea2baa9e99a7d4","name":"ansible-test"}]

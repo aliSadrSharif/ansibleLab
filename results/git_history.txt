@@ -1,0 +1,25 @@
+* f7a685d Remove obsolete server connection, server info, and Ansible setup files to streamline project structure and enhance maintainability. This cleanup eliminates unused resources and ensures a more efficient codebase.
+* 673d1f0 Add health checks for API and Nginx services in Docker Compose; update OpenSSL script for certificate generation with SAN support; remove README.md file to streamline project structure.
+*   6748d30 Merge pull request #3 from aliSadrSharif/ali
+|\  
+| * c9effe4 Update Nginx configuration to use service names for backend connections instead of localhost. This change improves compatibility with Docker networking and enhances the deployment process.
+| * f0d7ce8 Refactor Docker Compose configuration by consolidating API service definitions into a common template and removing obsolete load balancer configurations. This update enhances maintainability and simplifies the deployment process.
+| * 226cdd0 Remove obsolete configuration and documentation files related to server setup, Ansible inventory, and Docker deployment. This cleanup enhances project maintainability by eliminating unused resources and ensuring a more streamlined codebase.
+|/  
+*   a103bf6 Merge pull request #2 from aliSadrSharif/kiarash
+|\  
+| * 0b8da19 Add delivery evidence: git history, project summary, structure, contributions (stage 10)
+| * 69b6a1d Add project README, architecture, deployment guide and troubleshooting docs (stage 9)
+| * cfafc3a Automate full deployment with Ansible: app + Nginx + SSL (stage 8)
+| * 4fc3f52 Add self-signed TLS certificate and HTTPS redirect (stage 7)
+| * bdb247a Configure system Nginx as reverse proxy for myapp.local (stage 6)
+| * e2a828b Deploy stack to the target server and verify access (stage 5)
+| * 69bfa64 Harden Dockerfiles, rework compose stack, and record build/test evidence (stage 4)
+| * 1d4c42a Document chosen project structure and tech stack (stage 3)
+| * 84a5a8a Add environment docs and Ansible server provisioning (stages 1-2)
+|/  
+* 5e4f084 Update user state in App.js, clean up index.js by removing performance measurement comments, and change nginx configuration to use new domain name and SSL certificates.
+* 6fd8126 Refactor docker-compose.yaml: Update API URL for production, switch to expose for ports, and add nginx service for better deployment management.
+* bfdc7bd Remove HW_L5_03_Team Project.pdf from the repository
+* 887c8c9 Update REACT_APP_API_URL in docker-compose.yaml to use localhost for local development
+* af57734 intiat

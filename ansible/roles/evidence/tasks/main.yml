@@ -1,0 +1,218 @@
+---
+# Gather server-side evidence and write it back to the controller's results/.
+
+- name: Ensure results directory exists on controller
+  ansible.builtin.file:
+    path: "{{ results_dir }}"
+    state: directory
+    mode: "0755"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Collect system info for server_connection.txt
+  ansible.builtin.shell: |
+    set -e
+    echo "=== uname -a ==="
+    uname -a
+    echo
+    echo "=== lsb_release -a ==="
+    lsb_release -a 2>/dev/null || true
+    echo
+    echo "=== df -h ==="
+    df -h
+    echo
+    echo "=== free -h ==="
+    free -h
+    echo
+    echo "=== ip addr ==="
+    ip addr
+    echo
+    echo "=== whoami / hostname ==="
+    whoami
+    hostname
+  args:
+    executable: /bin/bash
+  register: server_connection
+  changed_when: false
+
+- name: Write server_connection.txt
+  ansible.builtin.copy:
+    content: "{{ server_connection.stdout }}\n"
+    dest: "{{ results_dir }}/server_connection.txt"
+  delegate_to: localhost
+  become: false
+
+- name: Collect Docker / Nginx / firewall verification
+  ansible.builtin.shell: |
+    set -e
+    echo "=== docker --version ==="
+    docker --version
+    echo
+    echo "=== docker compose version ==="
+    docker compose version
+    echo
+    echo "=== nginx -v ==="
+    nginx -v 2>&1
+    echo
+    echo "=== systemctl is-active docker nginx ==="
+    systemctl is-active docker || true
+    systemctl is-active nginx || true
+    echo
+    echo "=== systemctl is-enabled docker nginx ==="
+    systemctl is-enabled docker || true
+    systemctl is-enabled nginx || true
+    echo
+    echo "=== ufw status verbose ==="
+    ufw status verbose
+    echo
+    echo "=== docker compose ps ==="
+    cd {{ app_dir }} && docker compose ps
+  args:
+    executable: /bin/bash
+  register: verification
+  changed_when: false
+
+- name: Write 02_verification.txt
+  ansible.builtin.copy:
+    content: "{{ verification.stdout }}\n"
+    dest: "{{ results_dir }}/02_verification.txt"
+  delegate_to: localhost
+  become: false
+
+- name: Collect container status after deploy
+  ansible.builtin.shell: |
+    set -e
+    cd {{ app_dir }}
+    echo "=== docker compose ps ==="
+    docker compose ps
+    echo
+    echo "=== docker ps -a ==="
+    docker ps -a
+  args:
+    executable: /bin/bash
+  register: container_status
+  changed_when: false
+
+- name: Write 05_container_status.txt
+  ansible.builtin.copy:
+    content: "{{ container_status.stdout }}\n"
+    dest: "{{ results_dir }}/05_container_status.txt"
+  delegate_to: localhost
+  become: false
+
+- name: Also write 04_container_status.txt (local build evidence mirror)
+  ansible.builtin.copy:
+    content: "{{ container_status.stdout }}\n"
+    dest: "{{ results_dir }}/04_container_status.txt"
+  delegate_to: localhost
+  become: false
+
+- name: Collect important container logs
+  ansible.builtin.shell: |
+    set -e
+    cd {{ app_dir }}
+    echo "=== web logs (tail) ==="
+    docker compose logs --tail=50 web || true
+    echo
+    echo "=== api-1 logs (tail) ==="
+    docker compose logs --tail=50 api-1 || true
+    echo
+    echo "=== db logs (tail) ==="
+    docker compose logs --tail=30 db || true
+  args:
+    executable: /bin/bash
+  register: container_logs
+  changed_when: false
+
+- name: Write container_logs.txt
+  ansible.builtin.copy:
+    content: "{{ container_logs.stdout }}\n"
+    dest: "{{ results_dir }}/container_logs.txt"
+  delegate_to: localhost
+  become: false
+
+- name: Collect Nginx configuration
+  ansible.builtin.slurp:
+    src: "/etc/nginx/sites-available/{{ domain_name }}"
+  register: nginx_conf_slurp
+
+- name: Write nginx_config.txt and nginx_ssl_config.txt
+  ansible.builtin.copy:
+    content: "{{ nginx_conf_slurp.content | b64decode }}"
+    dest: "{{ results_dir }}/{{ item }}"
+  loop:
+    - nginx_config.txt
+    - nginx_ssl_config.txt
+  delegate_to: localhost
+  become: false
+
+- name: Collect certificate information
+  ansible.builtin.shell: |
+    set -e
+    CERT="{{ ssl_dir }}/{{ domain_name }}.crt"
+    KEY="{{ ssl_dir }}/{{ domain_name }}.key"
+    echo "Certificate path: $CERT"
+    echo "Private key path: $KEY"
+    echo
+    echo "=== openssl x509 -in cert -noout -text (summary) ==="
+    openssl x509 -in "$CERT" -noout -subject -issuer -dates -ext subjectAltName
+    echo
+    echo "=== full text (abbreviated dates above) ==="
+    openssl x509 -in "$CERT" -noout -text | head -80
+  args:
+    executable: /bin/bash
+  register: cert_info
+  changed_when: false
+
+- name: Write certificate_info.txt
+  ansible.builtin.copy:
+    content: "{{ cert_info.stdout }}\n"
+    dest: "{{ results_dir }}/certificate_info.txt"
+  delegate_to: localhost
+  become: false
+
+- name: Test from server (localhost via Nginx)
+  ansible.builtin.shell: |
+    set -e
+    echo "=== curl -I http://127.0.0.1/ (Host: {{ domain_name }}) ==="
+    curl -sI -H "Host: {{ domain_name }}" http://127.0.0.1/ || true
+    echo
+    echo "=== curl -kI https://127.0.0.1/ (Host: {{ domain_name }}) ==="
+    curl -skI -H "Host: {{ domain_name }}" https://127.0.0.1/ || true
+    echo
+    echo "=== curl -k https://127.0.0.1/api/users (Host: {{ domain_name }}) ==="
+    curl -sk -H "Host: {{ domain_name }}" https://127.0.0.1/api/users || true
+    echo
+    echo "=== direct loopback web ==="
+    curl -sI http://127.0.0.1:{{ web_port }}/ || true
+    echo
+    echo "=== direct loopback api ==="
+    curl -s http://127.0.0.1:{{ api_ports[0] }}/users || true
+    echo
+  args:
+    executable: /bin/bash
+  register: server_tests
+  changed_when: false
+
+- name: Write 05_test_results.txt (server-side)
+  ansible.builtin.copy:
+    content: "{{ server_tests.stdout }}\n"
+    dest: "{{ results_dir }}/05_test_results.txt"
+  delegate_to: localhost
+  become: false
+
+- name: Write 08_verification.txt
+  ansible.builtin.copy:
+    content: |
+      === Stage 8 verification ===
+      {{ verification.stdout }}
+
+      === Container status ===
+      {{ container_status.stdout }}
+
+      === Server HTTP/HTTPS tests ===
+      {{ server_tests.stdout }}
+    dest: "{{ results_dir }}/08_verification.txt"
+  delegate_to: localhost
+  become: false

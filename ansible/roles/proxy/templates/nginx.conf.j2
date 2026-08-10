@@ -1,0 +1,118 @@
+upstream api_backend {
+    least_conn;
+    server 127.0.0.1:3001 max_fails=3 fail_timeout=30s;
+    server 127.0.0.1:3002 max_fails=3 fail_timeout=30s;
+    server 127.0.0.1:3003 max_fails=3 fail_timeout=30s;
+    keepalive 32;
+}
+
+upstream web_backend {
+    server 127.0.0.1:{{ web_port }} max_fails=3 fail_timeout=30s;
+    keepalive 16;
+}
+
+upstream mongo_express_backend {
+    server 127.0.0.1:{{ mongo_express_port }} max_fails=3 fail_timeout=30s;
+}
+
+{% if tls_enabled %}
+server {
+    listen 80;
+    listen [::]:80;
+    server_name {{ domain_name }};
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name {{ domain_name }};
+
+    ssl_certificate     {{ ssl_dir }}/{{ domain_name }}.crt;
+    ssl_certificate_key {{ ssl_dir }}/{{ domain_name }}.key;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5:!3DES;
+    ssl_prefer_server_ciphers on;
+
+    access_log /var/log/nginx/{{ domain_name }}.access.log;
+    error_log  /var/log/nginx/{{ domain_name }}.error.log;
+
+    location / {
+        proxy_pass http://web_backend;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection "";
+    }
+
+    location /api/ {
+        proxy_pass http://api_backend/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection "";
+    }
+
+    location /mongo/ {
+        proxy_pass http://mongo_express_backend;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    error_page 502 503 504 /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
+    }
+}
+{% else %}
+server {
+    listen 80;
+    listen [::]:80;
+    server_name {{ domain_name }};
+
+    access_log /var/log/nginx/{{ domain_name }}.access.log;
+    error_log  /var/log/nginx/{{ domain_name }}.error.log;
+
+    location / {
+        proxy_pass http://web_backend;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection "";
+    }
+
+    location /api/ {
+        proxy_pass http://api_backend/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection "";
+    }
+
+    location /mongo/ {
+        proxy_pass http://mongo_express_backend;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    error_page 502 503 504 /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
+    }
+}
+{% endif %}

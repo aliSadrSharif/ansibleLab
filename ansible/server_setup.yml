@@ -1,0 +1,9 @@
+---
+# Stage 2: prepare the server (packages, Docker, Nginx, firewall).
+- name: Prepare server for deployment
+  hosts: webservers
+  become: true
+  roles:
+    - common
+    - docker
+    - nginx

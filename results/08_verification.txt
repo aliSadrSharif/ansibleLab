@@ -1,0 +1,103 @@
+=== Stage 8 verification ===
+=== docker --version ===
+Docker version 29.7.2, build a7dcaa6
+
+=== docker compose version ===
+Docker Compose version v5.4.0
+
+=== nginx -v ===
+nginx version: nginx/1.18.0 (Ubuntu)
+
+=== systemctl is-active docker nginx ===
+active
+active
+
+=== systemctl is-enabled docker nginx ===
+enabled
+enabled
+
+=== ufw status verbose ===
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), deny (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW IN    Anywhere                  
+80/tcp                     ALLOW IN    Anywhere                  
+443/tcp                    ALLOW IN    Anywhere                  
+22/tcp (v6)                ALLOW IN    Anywhere (v6)             
+80/tcp (v6)                ALLOW IN    Anywhere (v6)             
+443/tcp (v6)               ALLOW IN    Anywhere (v6)             
+
+
+=== docker compose ps ===
+NAME                    IMAGE                               COMMAND                  SERVICE         CREATED          STATUS                    PORTS
+myapp-api-1-1           myapp-api-1                         "docker-entrypoint.s…"   api-1           27 seconds ago   Up 20 seconds (healthy)   127.0.0.1:3001->3001/tcp
+myapp-api-2-1           myapp-api-2                         "docker-entrypoint.s…"   api-2           27 seconds ago   Up 20 seconds (healthy)   127.0.0.1:3002->3001/tcp
+myapp-api-3-1           myapp-api-3                         "docker-entrypoint.s…"   api-3           27 seconds ago   Up 20 seconds (healthy)   127.0.0.1:3003->3001/tcp
+myapp-db-1              mongo:4.4                           "docker-entrypoint.s…"   db              27 seconds ago   Up 26 seconds (healthy)   27017/tcp
+myapp-mongo-express-1   mongo-express:1.0.2-20-alpine3.19   "/sbin/tini -- /dock…"   mongo-express   27 seconds ago   Up 20 seconds (healthy)   127.0.0.1:8081->8081/tcp
+myapp-web-1             myapp-web                           "docker-entrypoint.s…"   web             27 seconds ago   Up 26 seconds (healthy)   127.0.0.1:3000->3000/tcp
+
+=== Container status ===
+=== docker compose ps ===
+NAME                    IMAGE                               COMMAND                  SERVICE         CREATED          STATUS                    PORTS
+myapp-api-1-1           myapp-api-1                         "docker-entrypoint.s…"   api-1           28 seconds ago   Up 21 seconds (healthy)   127.0.0.1:3001->3001/tcp
+myapp-api-2-1           myapp-api-2                         "docker-entrypoint.s…"   api-2           28 seconds ago   Up 21 seconds (healthy)   127.0.0.1:3002->3001/tcp
+myapp-api-3-1           myapp-api-3                         "docker-entrypoint.s…"   api-3           28 seconds ago   Up 21 seconds (healthy)   127.0.0.1:3003->3001/tcp
+myapp-db-1              mongo:4.4                           "docker-entrypoint.s…"   db              28 seconds ago   Up 27 seconds (healthy)   27017/tcp
+myapp-mongo-express-1   mongo-express:1.0.2-20-alpine3.19   "/sbin/tini -- /dock…"   mongo-express   28 seconds ago   Up 21 seconds (healthy)   127.0.0.1:8081->8081/tcp
+myapp-web-1             myapp-web                           "docker-entrypoint.s…"   web             28 seconds ago   Up 27 seconds (healthy)   127.0.0.1:3000->3000/tcp
+
+=== docker ps -a ===
+CONTAINER ID   IMAGE                               COMMAND                  CREATED          STATUS                    PORTS                      NAMES
+f99217739dae   mongo-express:1.0.2-20-alpine3.19   "/sbin/tini -- /dock…"   28 seconds ago   Up 21 seconds (healthy)   127.0.0.1:8081->8081/tcp   myapp-mongo-express-1
+8d807d8ca6f6   myapp-api-3                         "docker-entrypoint.s…"   28 seconds ago   Up 21 seconds (healthy)   127.0.0.1:3003->3001/tcp   myapp-api-3-1
+961114b82822   myapp-api-1                         "docker-entrypoint.s…"   28 seconds ago   Up 21 seconds (healthy)   127.0.0.1:3001->3001/tcp   myapp-api-1-1
+1e3ddec83e9d   myapp-api-2                         "docker-entrypoint.s…"   28 seconds ago   Up 21 seconds (healthy)   127.0.0.1:3002->3001/tcp   myapp-api-2-1
+c4bf80edfa41   mongo:4.4                           "docker-entrypoint.s…"   28 seconds ago   Up 27 seconds (healthy)   27017/tcp                  myapp-db-1
+844153d5328e   myapp-web                           "docker-entrypoint.s…"   28 seconds ago   Up 27 seconds (healthy)   127.0.0.1:3000->3000/tcp   myapp-web-1
+
+=== Server HTTP/HTTPS tests ===
+=== curl -I http://127.0.0.1/ (Host: myapp.local) ===
+HTTP/1.1 301 Moved Permanently
+Server: nginx/1.18.0 (Ubuntu)
+Date: Mon, 10 Aug 2026 13:58:17 GMT
+Content-Type: text/html
+Content-Length: 178
+Connection: keep-alive
+Location: https://myapp.local/
+
+
+=== curl -kI https://127.0.0.1/ (Host: myapp.local) ===
+HTTP/1.1 200 OK
+Server: nginx/1.18.0 (Ubuntu)
+Date: Mon, 10 Aug 2026 13:58:17 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 644
+Connection: keep-alive
+Content-Disposition: inline; filename="index.html"
+Accept-Ranges: bytes
+ETag: "348e0792b2f86356ea2cfe98210733220138f5d3"
+Vary: Accept-Encoding
+
+
+=== curl -k https://127.0.0.1/api/users (Host: myapp.local) ===
+[]
+=== direct loopback web ===
+HTTP/1.1 200 OK
+Content-Length: 644
+Content-Disposition: inline; filename="index.html"
+Accept-Ranges: bytes
+ETag: "348e0792b2f86356ea2cfe98210733220138f5d3"
+Content-Type: text/html; charset=utf-8
+Vary: Accept-Encoding
+Date: Mon, 10 Aug 2026 13:58:17 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+=== direct loopback api ===
+[]

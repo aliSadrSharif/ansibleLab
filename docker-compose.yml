@@ -1,0 +1,109 @@
+x-api-common: &api-common
+  build:
+    context: backend
+  environment:
+    - DB_URL=mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@db:27017/?authSource=admin
+    - CORS_ORIGINS=${CORS_ORIGINS:-}
+  restart: unless-stopped
+  networks:
+    - appnet
+  depends_on:
+    db:
+      condition: service_healthy
+  healthcheck:
+    test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/users', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"]
+    interval: 30s
+    timeout: 5s
+    retries: 3
+    start_period: 10s
+
+services:
+  web:
+    build:
+      context: frontend
+      args:
+        REACT_APP_API_URL: /api
+        NODE_OPTIONS: --max-old-space-size=1536
+    environment:
+      - REACT_APP_API_URL=/api
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped
+    networks:
+      - appnet
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  api-1:
+    <<: *api-common
+    ports:
+      - "127.0.0.1:3001:3001"
+
+  api-2:
+    <<: *api-common
+    ports:
+      - "127.0.0.1:3002:3001"
+
+  api-3:
+    <<: *api-common
+    ports:
+      - "127.0.0.1:3003:3001"
+
+  db:
+    image: mongo:4.4
+    expose:
+      - "27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+    volumes:
+      - mongodb-data:/data/db
+    restart: unless-stopped
+    networks:
+      - appnet
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  mongo-express:
+    image: mongo-express:1.0.2-20-alpine3.19
+    ports:
+      - "127.0.0.1:8081:8081"
+    environment:
+      ME_CONFIG_SITE_BASEURL: /mongo/
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USER}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD}
+      # ME_CONFIG_MONGODB_SERVER must stay unset: when present, mongo-express discards
+      # ME_CONFIG_MONGODB_URL and connects with no credentials.
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@db:27017/?authSource=admin
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - appnet
+    healthcheck:
+      # Basic auth is enabled, so an unauthenticated probe gets a 401 that still proves the server is up.
+      test:
+        [
+          "CMD-SHELL",
+          'out=$$(wget -q --spider -T 5 http://127.0.0.1:8081/mongo/ 2>&1) || echo "$$out" | grep -q 401'
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  mongodb-data:
+
+networks:
+  appnet:
+    driver: bridge

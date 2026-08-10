@@ -1,0 +1,7 @@
+=== Stage 4 local / server build evidence ===
+Application was built on the server via Ansible community.docker.docker_compose_v2.
+See 04_container_status.txt and deploy_log.txt / 08_playbook_output.txt for build output.
+
+=== Direct loopback checks via SSH ===
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="
+[]

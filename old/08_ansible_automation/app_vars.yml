@@ -1,6 +1,0 @@
----
-# Non-secret application deployment variables.
-# Real credentials live only in the repo's .env file (git-ignored), which is copied
-# to the target as-is by deploy_app.yml — never duplicated into Ansible vars.
-app_dir: /opt/myapp
-app_repo_root: "{{ playbook_dir }}/.."
