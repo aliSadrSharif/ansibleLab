@@ -1,4 +1,0 @@
-target | SUCCESS => {
-    "changed": false,
-    "ping": "pong"
-}

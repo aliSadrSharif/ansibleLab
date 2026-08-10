@@ -1,5 +1,0 @@
-NAME                         IMAGE            COMMAND                  SERVICE         CREATED         STATUS                   PORTS
-ansiblelab-api-1             ansiblelab-api   "docker-entrypoint.s…"   api             9 minutes ago   Up 9 minutes (healthy)   127.0.0.1:3001->3001/tcp
-ansiblelab-db-1              mongo:4.4        "docker-entrypoint.s…"   db              9 minutes ago   Up 9 minutes (healthy)   27017/tcp
-ansiblelab-mongo-express-1   mongo-express    "/sbin/tini -- /dock…"   mongo-express   9 minutes ago   Up 9 minutes             127.0.0.1:8081->8081/tcp
-ansiblelab-web-1             ansiblelab-web   "docker-entrypoint.s…"   web             9 minutes ago   Up 9 minutes (healthy)   127.0.0.1:3000->3000/tcp
