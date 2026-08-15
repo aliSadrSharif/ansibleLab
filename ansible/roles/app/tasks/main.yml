@@ -1,4 +1,24 @@
 ---
+# Create application directory
+#           ↓
+# Sync project files
+#           ↓
+# Fix ownership
+#           ↓
+# Generate .env
+#           ↓
+# Build + start Docker Compose
+#           ↓
+# Wait for ports
+#     ├── Frontend
+#     ├── API replicas
+#     └── Mongo Express
+#           ↓
+# HTTP health checks
+#     ├── Frontend → 200
+#     └── API → 200
+#           ↓
+# Print deployment summary
 - name: Create application directory
   ansible.builtin.file:
     path: "{{ app_dir }}"

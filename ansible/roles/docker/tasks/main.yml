@@ -1,4 +1,21 @@
 ---
+# Create /etc/apt/keyrings
+#           ↓
+# Download Docker GPG key
+#           ↓
+# Add Docker official APT repository
+#           ↓
+# Install Docker Engine + CLI + containerd
+#           ↓
+# Install Buildx + Docker Compose
+#           ↓
+# Start Docker
+#           ↓
+# Enable Docker at boot
+#           ↓
+# Add app_owner → docker group
+#           ↓
+# Install Python Docker SDK for Ansible
 - name: Create keyrings directory
   ansible.builtin.file:
     path: /etc/apt/keyrings
