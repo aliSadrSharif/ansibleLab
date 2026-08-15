@@ -1,4 +1,26 @@
 ---
+#                  nginx.conf.j2
+#                        │
+#                        │ template
+#                        ▼
+#           /etc/nginx/sites-available/
+#                        │
+#                        │ symlink
+#                        ▼
+#            /etc/nginx/sites-enabled/
+#                        │
+#                        ▼
+#                  Nginx loads it
+#                        │
+#                        ▼
+#                   nginx -t
+#                        │
+#                 ┌──────┴──────┐
+#                 │             │
+#              valid          invalid
+#                 │             │
+#                 ▼             ▼
+#           Reload Nginx     Playbook fails
 - name: Deploy Nginx site configuration
   ansible.builtin.template:
     src: nginx.conf.j2

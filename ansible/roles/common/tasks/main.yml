@@ -1,4 +1,24 @@
 ---
+# 1. Disable broken CD-ROM APT repositories
+#               ↓
+# 2. Find additional APT .list files
+#               ↓
+# 3. Disable CD-ROM entries in those files
+#               ↓
+# 4. Update APT package cache
+#               ↓
+# 5. Upgrade the system
+#               ↓
+# 6. Install essential DevOps/system packages
+#               ↓
+# 7. Configure UFW
+#    ├── Allow SSH :22
+#    ├── Allow HTTP :80
+#    ├── Allow HTTPS :443
+#    ├── Deny other incoming traffic
+#    └── Allow outgoing traffic
+#               ↓
+# 8. Enable firewall
 - name: Disable apt CDROM / file:/cdrom sources that break update_cache
   ansible.builtin.replace:
     path: /etc/apt/sources.list

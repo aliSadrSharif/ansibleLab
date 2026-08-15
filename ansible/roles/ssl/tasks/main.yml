@@ -1,4 +1,30 @@
 ---
+    #              SSL/TLS Setup
+    #                   │
+    #                   ▼
+    #          Create SSL directory
+    #                   │
+    #                   ▼
+    #           Generate RSA key
+    #           domain_name.key
+    #                   │
+    #                   ▼
+    #           Generate CSR
+    #                   │
+    #       ┌───────────┴───────────┐
+    #       │                       │
+    #  Common Name              SAN entries
+    #  domain_name              domain_name
+    #                           localhost
+    #                           127.0.0.1
+    #       │                       │
+    #       └───────────┬───────────┘
+    #                   ▼
+    #       Generate self-signed
+    #          X.509 certificate
+    #                   │
+    #                   ▼
+    #          domain_name.crt
 - name: Create SSL directory
   ansible.builtin.file:
     path: "{{ ssl_dir }}"

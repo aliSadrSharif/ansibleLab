@@ -1,5 +1,4 @@
 === /etc/hosts (relevant lines) ===
-192.168.31.104 daneshkar.local
 192.168.31.104 myapp.local
 
 Mapped domain myapp.local -> 192.168.31.104
