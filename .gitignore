@@ -15,7 +15,6 @@ backend/dist/
 *.key
 *.crt
 nginx/ssl/
-07_ssl/certs/
 ansible/group_vars/all/secrets.yml
 
 # Logs
